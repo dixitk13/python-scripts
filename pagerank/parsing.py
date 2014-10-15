@@ -4,23 +4,19 @@ from datetime import datetime
 import operator
 
 # List(Strings) - is the sink nodes in the graph, i.e., pages that have no out links
-#S = []
 sink =[]
 
 # List(Strings) - is the set of all pages
-#P = []
 pages =[]
 
 # <key, value> -> <String, List(String)> -  is the set (without duplicates) of pages that link to page p
 M = {}
 
 # <key, value> -> < String, number > - is the number of out-links (without duplicates) from page q
-#L = {}
 out_links ={}
 
 # Page Rank Value <key, value> -> < String, number >
 page_rank = {}
-#page_rank_val = {}
 
 # in links
 in_links = {}
@@ -29,13 +25,16 @@ in_links = {}
 # d is the PageRank damping/teleportation factor; use d = 0.85 as is typical
 d = 0.85
 
-#file_path = "test.txt"
+file_path = "test.txt"
 #file_path = "wt2g_inlinks_3.txt"
-file_path = "wt2g_inlinks.txt"
+#file_path = "wt2g_inlinks.txt"
 #file_path = "wt2g_inlinks_2.txt"
 
 dt = datetime.today()
-output = open("pagerank_loop.txt", "w+")
+output = open("smallvertexop.txt", "w+")
+output_debug = open("smallvertexop_debug.txt", "w+")
+# output = open("pagerank_loop0.txt", "w+")
+# output_debug = open("pagerankdebug_loop0.txt", "w+")
 
 def calculate_in_links(M):
 	C ={}
@@ -63,13 +62,25 @@ def populate_data(arg_file_path, M, out_links, pages, sink):
     for everyline in file:
         words = everyline.split()
         page = words[0]
-        if page in pages:
-            #if not words[1:]:
-            M[page] += words[1:]
-            M[page] = set(M[page])
+
+        if page in M.keys():
+            for k,v in M.items():
+                if k==page:
+                    X=words[1:]
+                    for va in v:
+                        X.append(va)
+                    M[page]=set(X)
         else:
-            pages.append(page)
-            M[page] = words[1:]
+            M[page] = set(words[1:])
+            if page not in pages:
+                pages.append(page)
+
+        #     #if not words[1:]:
+        #     M[page] += words[1:]
+        #     M[page] = set(M[page])
+        # else:
+        #     pages.append(page)
+        #     M[page] = words[1:]
 
     for k, v in M.items():
         for node in v:
@@ -81,10 +92,10 @@ def populate_data(arg_file_path, M, out_links, pages, sink):
             out_links[node] = temp
 
     print('Finished checking lines')
-    for value in out_links:
-        if value not in pages:
-            #print('Do I add them Pages?? -> ', value)
-            pages.append(value)
+    # for value in out_links:
+    #     if value not in pages:
+    #         #print('Do I add them Pages?? -> ', value)
+    #         pages.append(value)
     for val in pages:
         if val not in out_links:
             sink.append(val)
@@ -100,11 +111,11 @@ print('outlinks', out_links)
 print('m', M)
 print('pages',pages)
 print('sink',sink)
-output.write('N---> ' + str(N) + '\n' + '\n')
-output.write('M---> ' + str(M) + '\n' + '\n')
-output.write('outlinks---> ' + str(out_links) + '\n' + '\n')
-output.write('Pages---> ' + str(pages) + '\n' + '\n')
-output.write('SINK---> ' + str(sink) + '\n' + '\n')
+output_debug.write('N---> ' + str(N) + '\n' + '\n')
+output_debug.write('M---> ' + str(M) + '\n' + '\n')
+output_debug.write('outlinks---> ' + str(out_links) + '\n' + '\n')
+output_debug.write('Pages---> ' + str(pages) + '\n' + '\n')
+output_debug.write('SINK---> ' + str(sink) + '\n' + '\n')
 
 
 
@@ -114,16 +125,16 @@ def page_rank_function(page_rank, pages, out_links, sink, M, d, N):
     print('[START pagerank]', dt.now())
     output.write('[START pagerank]' + str(dt.now()) + '\n')
     for p in pages:
-        #print('p',p)
+
         page_rank[p] = 1/N
         newPR = {}
 
         prev_perplexity = 0.0
     perplexity = calculate_perplexity(page_rank)
-        #print('perplexity is ', perplexity)
+
     i = 0
     print('before pagerank',page_rank)
-    while i < 100:
+    while i < 10:
         sinkPR = 0
 
         for s in sink:
@@ -157,16 +168,16 @@ def page_rank_fun(page_rank, pages, out_links, sink, M, d, N):
         # perplexity string
         perplexity_string = ''
     perplexity = calculate_perplexity(page_rank)
-        #print('perplexity is', perplexity)
+
     i = 0
     j = 0
     print('pagerank',page_rank)
     while True:
         j += 1
-        perplexity_string += str(perplexity) + '\n'
+        perplexity_string += '\n' + str(perplexity) + '\n'
         print('perplexity', perplexity)
         print('prev_perplexity', prev_perplexity)
-        output.write('Loop -> '+  str(i) + 'perplexity' + str(perplexity) + '     ' + 'prev_perplexity' + str(prev_perplexity) + '\n' + '\n')
+        output.write('Loop -> '+  str(j) + ' : perplexity is ' + str(perplexity) + '\n' + '\n')# + '     ' + 'prev_perplexity' + str(prev_perplexity) + '\n' + '\n')
         if abs(int(perplexity) - int(prev_perplexity)) < 1:
             i += 1
         else:
@@ -194,19 +205,24 @@ def page_rank_fun(page_rank, pages, out_links, sink, M, d, N):
         perplexity = calculate_perplexity(page_rank)
         print('Page: '+ str(j) +  str(dt.now()) +' perplexity ' + str(perplexity) + '\n' + '\n')
     print('[END page_rank_rel]', dt.now())
-    output.write('perplexity' + str(perplexity_string) + '\n' + '\n')
+    output_debug.write('perplexity Values Concat' + str(perplexity_string) + '\n' + '\n')
     output.write('[END page_rank_rel]' + str(dt.now()) + '\n' + '\n')
     return page_rank
 
 
-page_rank_fun_o_p = page_rank_fun(page_rank, pages, out_links, sink, M, d, N)
-print('rel_page_rank',page_rank_fun_o_p)
-output.write('rel_page_rank' + str(page_rank_fun_o_p) + '\n' + '\n')
+page_rank_fun_o_p = page_rank_function(page_rank, pages, out_links, sink, M, d, N)
+# print('rel_page_rank',page_rank_fun_o_p)
+# output.write('rel_page_rank' + str(page_rank_fun_o_p) + '\n' + '\n')
 
 sorted_page_rank = sorted(page_rank_fun_o_p.items(), key=lambda x: x[1], reverse=True)
 print('sorted_page_rank',sorted_page_rank)
-output.write('sorted_page_rank' + str(sorted_page_rank) + '\n' + '\n')
+output.write('SORTED PAGE RANK' + str(sorted_page_rank) + '\n' + '\n')
 
 in_links = calculate_in_links(M)
-print('in links', in_links)
-output.write('in links' + str(in_links) + '\n')
+print('IN LINKS IN SORTED ORDER', in_links)
+output.write('IN LINKS IN SORTED ORDER' + str(in_links) + '\n')
+
+## Printing output
+#
+# for x in range(0, 50):
+#     output_debug.write('IN LINKS IN SORTED ORDER' + str(in_links) + '\n')

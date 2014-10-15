@@ -1,9 +1,0 @@
-[START populate_data_from_file]2014-10-08 15:19:09.762388
-[END populate_data_from_file]2014-10-08 15:19:09.762388
-N--> 6.0
-M-->{'A': ['D', 'E', 'F'], 'D': ['B', 'C'], 'C': ['A', 'B', 'D'], 'B': ['A', 'F'], 'E': ['B', 'C', 'D', 'F'], 'F': ['A', 'B', 'D']}
-L-->{}
-P-->['A', 'B', 'C', 'D', 'E', 'F']
-S-->['A', 'B', 'C', 'D', 'E', 'F']
-[START pagerank]2014-10-08 15:19:09.762388
-perplexity6.0     prev_perplexity0.0

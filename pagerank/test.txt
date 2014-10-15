@@ -4,6 +4,3 @@ C A B D
 D B C
 E B C D F
 F A B D
-A X D
-X Y
-Z
