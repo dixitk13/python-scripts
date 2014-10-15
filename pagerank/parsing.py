@@ -75,13 +75,6 @@ def populate_data(arg_file_path, M, out_links, pages, sink):
             if page not in pages:
                 pages.append(page)
 
-        #     #if not words[1:]:
-        #     M[page] += words[1:]
-        #     M[page] = set(M[page])
-        # else:
-        #     pages.append(page)
-        #     M[page] = words[1:]
-
     for k, v in M.items():
         for node in v:
             temp = 1
@@ -92,16 +85,12 @@ def populate_data(arg_file_path, M, out_links, pages, sink):
             out_links[node] = temp
 
     print('Finished checking lines')
-    # for value in out_links:
-    #     if value not in pages:
-    #         #print('Do I add them Pages?? -> ', value)
-    #         pages.append(value)
+
     for val in pages:
         if val not in out_links:
             sink.append(val)
     print('[END populate_data_from_file]', dt.now())
     output.write('[END populate_data_from_file]' + str(dt.now()) + '\n' + '\n')
-    #print('sink',sink)
 
 populate_data(file_path, M, out_links, pages, sink)
 
@@ -134,7 +123,7 @@ def page_rank_function(page_rank, pages, out_links, sink, M, d, N):
 
     i = 0
     print('before pagerank',page_rank)
-    while i < 10:
+    while i < 100:
         sinkPR = 0
 
         for s in sink:
@@ -210,7 +199,7 @@ def page_rank_fun(page_rank, pages, out_links, sink, M, d, N):
     return page_rank
 
 
-page_rank_fun_o_p = page_rank_function(page_rank, pages, out_links, sink, M, d, N)
+page_rank_fun_o_p = page_rank_fun(page_rank, pages, out_links, sink, M, d, N)
 # print('rel_page_rank',page_rank_fun_o_p)
 # output.write('rel_page_rank' + str(page_rank_fun_o_p) + '\n' + '\n')
 
